@@ -1,11 +1,14 @@
 package com.demo.mdb;
 
+import java.awt.font.TextMeasurer;
 import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.TextMessage;
 
 /**
  * Message-Driven Bean implementation class for: DemoMDB
@@ -16,15 +19,15 @@ import javax.jms.MessageListener;
 				propertyName = "destinationType", propertyValue = "javax.jms.Topic")
 		}, 
 		mappedName = "DemoTopic")
-public class DemoMDB implements MessageListener {
+public class DemoTopicMDB implements MessageListener {
 
 	Logger log=Logger.getLogger(getClass().getName());
     /**
      * Default constructor. 
      */
-    public DemoMDB() {
+    public DemoTopicMDB() {
 
-    	log.info("**********************************MDB*****************");
+    	log.info("*************************DemoTopicMDB*****************");
     	
     }
 	
@@ -33,8 +36,15 @@ public class DemoMDB implements MessageListener {
      */
     public void onMessage(Message message) {
     	
-    	log.info("Recv : "+message);;
-        
+    	log.info("Recv DemoTopic: "+message);
+    	if (message instanceof TextMessage) {
+    		try {
+				log.info(((TextMessage) message).getText());
+			} catch (JMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
     }
 
 }
