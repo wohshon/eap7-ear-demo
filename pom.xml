@@ -17,15 +17,22 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+<!--
     <groupId>com.demo</groupId>
     <artifactId>demoapp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>demoapp</name>
     <description>A starter Java EE 7 webapp project for use on JBoss EAP 7</description>
+-->
 
-    <url>http://jboss.org/jbossas</url>
+    <groupId>com.demo</groupId>
+    <artifactId>jeeapp</artifactId>
+    <version>1.0</version>
+    <packaging>pom</packaging>
+    <name>Demo App EAP 7 GA based on EAP 7 quickstart</name>
+    <description>Top level POM file</description>
+    <url>http://www.jboss.org/products/eap</url>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -44,13 +51,19 @@
         <!-- JBoss dependency versions -->
         <version.jboss.maven.plugin>7.9.Final</version.jboss.maven.plugin>
 
+        <!-- WildFly Maven plug-in to deploy your WAR to a local JBoss EAP container -->
+        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+
         <!-- Define the version of the JBoss BOMs we want to import to specify 
             tested stacks. -->
         <version.jboss.bom.eap>7.2.2.GA</version.jboss.bom.eap>
 
         <!-- other plugin versions -->
         <version.surefire.plugin>2.12.2-redhat-1</version.surefire.plugin>
-        <version.war.plugin>2.1.1.redhat-1</version.war.plugin>
+        <!-- other plug-in versions -->
+        <version.ear.plugin>2.8-redhat-1</version.ear.plugin>
+        <version.ejb.plugin>2.2.1-redhat-1</version.ejb.plugin>
+        <version.war.plugin>2.1.1-redhat-1</version.war.plugin>
 
         <!-- maven-compiler-plugin -->
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -58,8 +71,35 @@
     </properties>
 
 
+    <modules>
+        <module>ejb</module>
+        <module>web</module>
+        <module>ear</module>
+    </modules>
+
+
     <dependencyManagement>
         <dependencies>
+            <!-- Define the version of the EJB jar so that we don't need
+                                 to repeat ourselves in every module -->
+            <dependency>
+                <groupId>com.demo</groupId>
+                <artifactId>jeeapp-ejb</artifactId>
+                <version>${project.version}</version>
+                <type>ejb</type>
+            </dependency>
+
+            <!-- Define the version of the WAR so that we don't need to repeat
+                                 ourselves in every module -->
+            <dependency>
+                <groupId>com.demo</groupId>
+                <artifactId>jeeapp-web</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
+                <scope>compile</scope>
+            </dependency>
+
+
             <!-- JBoss distributes a complete set of Java EE 6 APIs including a Bill 
                 of Materials (BOM). A BOM specifies the versions of a "stack" (or a collection) 
                 of artifacts. We use this here so that we always get the correct versions 
@@ -70,7 +110,7 @@
                 from the Hibernate family of projects) -->
             <dependency>
                 <groupId>org.jboss.bom</groupId>
-                <artifactId>jboss-eap-javaee8</artifactId>
+                <artifactId>jboss-eap-javaee8-with-tools</artifactId>
                 <version>${version.jboss.bom.eap}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -99,28 +139,38 @@
         </dependency>
 
         <!-- Import the Common Annotations API (JSR-250), we use provided scope 
-            as the API is included in JBoss EAP 6 -->
+            as the API is included in JBoss EAP 7 -->
         <dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>
-            <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+            <artifactId>jboss-annotations-api_1.3_spec</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <!-- Import the JAX-RS API, we use provided scope as the API is included 
-            in JBoss EAP 6 -->
+            in JBoss EAP 7 -->
         <dependency>
             <groupId>org.jboss.spec.javax.ws.rs</groupId>
-            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+            <artifactId>jboss-jaxrs-api_2.1_spec</artifactId>
             <scope>provided</scope>
         </dependency>
 
         <!-- Import the JPA API, we use provided scope as the API is included in 
-            JBoss EAP 6 -->
-        <dependency>
+            JBoss EAP 7
+        ## deprecated, see next depency
+	<dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
-            <artifactId>hibernate-jpa-2.1-api</artifactId>
+            <artifactId>hibernate-jpa-2.2-api-parent</artifactId>
             <scope>provided</scope>
         </dependency>
+	-->
+	<!-- https://mvnrepository.com/artifact/javax.persistence/javax.persistence-api -->
+	<dependency>
+    	  <groupId>javax.persistence</groupId>
+    	  <artifactId>javax.persistence-api</artifactId>
+    	  <!--    <version>2.2.0.redhat-1</version> -->
+   	  <scope>provided</scope>
+	</dependency>
+
 
         <!-- Import the EJB API, we use provided scope as the API is included in 
             JBoss EAP 6 -->
@@ -132,8 +182,9 @@
 
         <!-- JSR-303 (Bean Validation) Implementation -->
         <!-- Provides portable constraints such as @Email -->
-        <!-- Hibernate Validator is shipped in JBoss EAP 6 -->
-        <dependency>
+        <!-- Hibernate Validator is shipped in JBoss EAP 6
+         ##deprecated, see next dependency
+	 <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator</artifactId>
             <scope>provided</scope>
@@ -144,12 +195,30 @@
                 </exclusion>
             </exclusions>
         </dependency>
+-->
+	<!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
+	<dependency>
+    	  <groupId>org.hibernate.validator</groupId>
+    	  <artifactId>hibernate-validator</artifactId>
+    	  <scope>provided</scope>
+	<!--
+    	<version>6.0.16.Final-redhat-00001</version>
+	-->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+
+	</dependency>
+
 
         <!-- Import the JSF API, we use provided scope as the API is included in 
             JBoss EAP 6 -->
         <dependency>
             <groupId>org.jboss.spec.javax.faces</groupId>
-            <artifactId>jboss-jsf-api_2.2_spec</artifactId>
+            <artifactId>jboss-jsf-api_2.3_spec</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -164,12 +233,24 @@
         </dependency>
 
         <!-- Annotation processor that raising compilation errors whenever constraint 
-            annotations are incorrectly used. -->
+            annotations are incorrectly used.
+	##deprecated , see next dependency
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-validator-annotation-processor</artifactId>
             <scope>provided</scope>
         </dependency>
+	-->
+	<!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator-annotation-processor -->
+	<dependency>
+    	  <groupId>org.hibernate.validator</groupId>
+    	  <artifactId>hibernate-validator-annotation-processor</artifactId>
+    	  <scope>provided</scope>
+	<!--
+    	<version>6.0.16.Final-redhat-00001</version>
+	-->
+	</dependency>
+
 
         <!-- Needed for running tests (you may also use TestNG) -->
         <dependency>
@@ -318,7 +399,7 @@
             </build>
         </profile>
 
-        <!-- Activate JBoss Product Maven repository -->
+        <!-- Activate JBoss Product Maven repository
         <profile>
             <id>jboss-product-repository</id>
             <activation>
@@ -333,6 +414,6 @@
                 </repository>
             </repositories>
         </profile>
-
+	-->
     </profiles>
 </project>
