@@ -48,15 +48,18 @@
             resources, i.e. build is platform dependent! -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <version.jaxb-core>2.2.11.redhat-4</version.jaxb-core>
+        <version.jaxb-impl>2.2.11.redhat-4</version.jaxb-impl>
+        <version.jaxb-api>2.3.0.redhat-00003</version.jaxb-api>
         <!-- JBoss dependency versions -->
         <version.jboss.maven.plugin>7.9.Final</version.jboss.maven.plugin>
 
         <!-- WildFly Maven plug-in to deploy your WAR to a local JBoss EAP container -->
-        <version.wildfly.maven.plugin>1.0.2.Final</version.wildfly.maven.plugin>
+        <version.wildfly.maven.plugin>2.0.2.Final</version.wildfly.maven.plugin>
 
         <!-- Define the version of the JBoss BOMs we want to import to specify 
             tested stacks. -->
-        <version.jboss.bom.eap>7.2.2.GA</version.jboss.bom.eap>
+        <version.jboss.bom.eap>7.3.0.CD17</version.jboss.bom.eap>
 
         <!-- other plugin versions -->
         <version.surefire.plugin>2.12.2-redhat-1</version.surefire.plugin>
@@ -65,9 +68,10 @@
         <version.ejb.plugin>2.2.1-redhat-1</version.ejb.plugin>
         <version.war.plugin>2.1.1-redhat-1</version.war.plugin>
 
-        <!-- maven-compiler-plugin -->
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <!-- maven-compiler-plugin 
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>-->
     </properties>
 
 
@@ -215,7 +219,7 @@
 
 
         <!-- Import the JSF API, we use provided scope as the API is included in 
-            JBoss EAP 6 -->
+            JBoss EAP 7 -->
         <dependency>
             <groupId>org.jboss.spec.javax.faces</groupId>
             <artifactId>jboss-jsf-api_2.3_spec</artifactId>
@@ -273,7 +277,23 @@
             <artifactId>arquillian-protocol-servlet</artifactId>
             <scope>test</scope>
         </dependency>
+<!--jdk 11-->
 
+<dependency>
+	<groupId>com.sun.xml.bind</groupId>
+	<artifactId>jaxb-core</artifactId>
+	<version>${version.jaxb-core}</version>
+</dependency>
+<dependency>
+	<groupId>javax.xml.bind</groupId>
+	<artifactId>jaxb-api</artifactId>
+	<version>${version.jaxb-api}</version>
+</dependency>
+<dependency>
+	<groupId>com.sun.xml.bind</groupId>
+	<artifactId>jaxb-impl</artifactId>
+	<version>${version.jaxb-impl}</version>
+</dependency>
     </dependencies>
 
     <build>
@@ -296,6 +316,15 @@
                 <artifactId>jboss-as-maven-plugin</artifactId>
                 <version>${version.jboss.maven.plugin}</version>
             </plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <version>3.8.1</version>
+    <configuration>
+        <release>11</release>
+    </configuration>
+</plugin>
+            
         </plugins>
     </build>
 
